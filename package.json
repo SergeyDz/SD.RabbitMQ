@@ -6,6 +6,9 @@
   "author": "Sergey Dzyuban <sergey.dzyuban@gmail.com>",
   "dependencies": {
     "express": "latest",
-    "amqplib": "latest"
+    "amqplib": "latest",
+    "sequelize": "latest",
+    "mssql": "latest",
+    "tedious": "latest"
   }
 }
