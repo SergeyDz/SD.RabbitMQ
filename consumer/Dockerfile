@@ -9,13 +9,13 @@ RUN 	apt-get update
 RUN     apt-get -y install nodejs
 RUN     apt-get -y install npm
 
-# install PostgresSql
 
 # Bundle app source
 COPY . /
 # Install app dependencies
 
-RUN cd /src && npm install
-EXPOSE  8087
+RUN  npm install
 
-CMD nodejs index.js 
+RUN ln -sf /dev/stdout /out.log
+
+CMD nodejs parties.js

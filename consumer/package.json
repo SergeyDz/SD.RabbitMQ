@@ -1,0 +1,12 @@
+{
+  "name": "docker-hello-world",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Node.js Hello world app on Ubuntu using docker",
+  "author": "Sergey Dzyuban <sergey.dzyuban@gmail.com>",
+  "dependencies": {
+    "amqplib": "latest",
+    "node-rest-client": "latest",
+    "promise": "latest"
+  }
+}

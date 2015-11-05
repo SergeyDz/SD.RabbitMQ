@@ -3,7 +3,6 @@ var mssql = require('./db.js'),
 	sequelize = mssql.sequelize;
 
 var Client = sequelize.define('clients', {
-  Id: Sequelize.INTEGER,
   ClientId: Sequelize.TEXT,
   Name: Sequelize.TEXT,
   Description: Sequelize.TEXT,
