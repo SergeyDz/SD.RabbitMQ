@@ -16,7 +16,7 @@ function PublishPartyPage(rabbit, pageSize, offset)
   console.log('Processing MQ for Partys. Page/Offset: ' + pageSize + '/' + offset);
   Party.findAndCountAll({include:[{model:PartyType}], limit: pageSize, offset: offset}).then(function(data) {
             data.rows.forEach(function(party) {
-              //console.log(JSON.stringify(party));
+              console.log(JSON.stringify(party));
               rabbit.sendToQueue(q, new Buffer(JSON.stringify(party)));
             });
    console.log('Total: ' + data.count);

@@ -17,100 +17,96 @@ function consumer(conn, token, http) {
   function on_open(err, ch) {
     if (err != null) bail(err);
     ch.assertQueue(q);
-    ch.consume(q, function(msg) {
+    ch.consume(q, function (msg) {
       if (msg !== null) {
         var party = JSON.parse(msg.content.toString());
-        postParty(http, token, party).then(function(data) {
+        postParty(http, token, party).then(function (data) {
           console.log('Party added. #: ' + data);
           ch.ack(msg);
         },
-        function(response) {
-          console.log('Skip message with error: ' + response);
-          ch.nack(msg, false, false);
-          //process.exit(1);
-        });
-        
+          function (response) {
+            console.log('Skip message with error: ' + response);
+            ch.nack(msg, false, false);
+            //process.exit(1);
+          });
+
       }
     });
   }
 }
 
-function postParty(http, token, party)
-{
-  var promise = new Promise(function(resolve, reject) {
+function postParty(http, token, party) {
+  var promise = new Promise(function (resolve, reject) {
+    console.log(JSON.stringify(party));
     var args = {
-      data:  { partyId: party.PartyId, Name: party.Name, partytype: party.PartyType.Key},
-      headers:{"Content-Type": "application/json", "Authorization" : token} 
-    }; 
-     
-    http.post(url+"api/common/party", args, function(data, response) {
-        if (response.statusCode != 200) {
-          if (data.hasOwnProperty("error")) {
-            reject(data.error);  
-          } else {
-            console.log("error from server: " + data);
-            reject(data);  
-          }
-        }
-        resolve(data);
-    })
-    .on('error', function(err) {
-      console.log(err);
-      reject(err);
-    });
-    
-    });
-    return promise;
-}
-
-
-function authorize(http)
-{
-  var promise = new Promise(function(resolve, reject) {
-  // set content-type header and data as json in args parameter 
-  var args = {
-      data:  "grant_type=password&username=admin&password=&tenantId=",
-      headers:{"Content-Type": "application/x-www-form-urlencoded"} 
+      data: { PartyId: party.PartyId, Name: party.Name, PartyType: party.PartyType.Key },
+      headers: { "Content-Type": "application/json", "Authorization": token }
     };
-    
-    console.log('Authorize started');
-    
-    http.post(url + "token", args, function(data,response) {
+
+    http.post(url + "api/common/party", args, function (data, response) {
       if (response.statusCode != 200) {
         if (data.hasOwnProperty("error")) {
-          reject(data.error);  
+          reject(data.error);
         } else {
-          reject(response.headers.status);  
+          console.log("error from server: " + data);
+          reject(data);
         }
       }
       resolve(data);
     })
-    .on('error', function(err) {
-     reject(err);
-   });
+      .on('error', function (err) {
+        console.error(err);
+        reject(err);
+      });
+
   });
-  
   return promise;
 }
-  
+
+
+function authorize(http) {
+  var promise = new Promise(function (resolve, reject) {
+    // set content-type header and data as json in args parameter 
+    var args = {
+      data: "grant_type=password&username=admin&password=&tenantId=",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    };
+
+    console.log('Authorize started');
+
+    http.post(url + "token", args, function (data, response) {
+      if (response.statusCode != 200) {
+        if (data.hasOwnProperty("error")) {
+          reject(data.error);
+        } else {
+          reject(response.headers.status);
+        }
+      }
+      resolve(data);
+    })
+      .on('error', function (err) {
+        reject(err);
+      });
+  });
+
+  return promise;
+}
+
 var http = new Rest();
-
-
-authorize(http).then(function(data) {
-  var token = 'Bearer ' +  data.access_token;
+authorize(http).then(function (data) {
+  var token = 'Bearer ' + data.access_token;
   console.log('Connection with REST established');
-  amqplib.connect(mq, function(err, conn) {
+  amqplib.connect(mq, function (err, conn) {
     if (err != null) {
-        console.log(err);
-        bail(err);
+      console.log(err);
+      bail(err);
     }
     consumer(conn, token, http);
   });
 },
-function(rest_error)
-{
-  console.log('Cant authorize REST service: '  + rest_error);
-}
-);
+  function (rest_error) {
+    console.error('Cant authorize REST service: ' + rest_error);
+  }
+  );
 
-console.log('Service started');
+console.warn('Service started');
