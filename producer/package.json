@@ -9,6 +9,6 @@
     "amqplib": "latest",
     "sequelize": "latest",
     "mssql": "latest",
-    "tedious": "latest"
+    "tedious": "18.6.2"
   }
 }
